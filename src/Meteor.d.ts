@@ -1,9 +1,6 @@
 declare module '@meteorrn/core' {
   type Callback = (...args: unknown[]) => void;
-
-  function connect(endpoint: string, options?: any): void;
-  function disconnect(): void;
-  function reconnect(): void;
+  
   type Status =
     | 'change'
     | 'connected'
@@ -11,15 +8,7 @@ declare module '@meteorrn/core' {
     | 'loggingIn'
     | 'loggingOut';
 
-  function call(...args: any[]): void;
-  function status(): {
-    connected: boolean;
-    status: Status;
-  };
-
-  function logout(cb: Callback): void;
-  function loggingOut(): boolean;
-  function loggingIn(): boolean;
+  type useTracker<T> = (cb: () => T) => T
 
   interface Data {
     getUrl(): string;
@@ -35,7 +24,6 @@ declare module '@meteorrn/core' {
       socket: unknown;
     };
   }
-  function getData(): Data;
 
   interface User {
     _id: string;
@@ -45,15 +33,47 @@ declare module '@meteorrn/core' {
       settings: {};
     };
   }
-  function user(): User | undefined;
+
+  interface Meteor {
+    connect(endpoint: string, options?: any): void;
+    disconnect(): void;
+    reconnect(): void;
+
+    call(...args: any[]): void;
+    status(): {
+      connected: boolean;
+      status: Status;
+    };
+
+    logout(cb: Callback): void;
+    loggingOut(): boolean;
+    loggingIn(): boolean;
+
+    getData(): Data;
+    user(): User | undefined;
+    getAuthToken(): string;
+
+    readonly isVerbose: boolean;
+    enableVerbose(): void;
+
+    useTracker<T>(): useTracker<T>;
+
+    ddp: Data; 
+
+    _handleLoginCallback(err: any, res: any): void;
+  }
+
   interface Accounts {
     onLogin(cb: Callback): void;
   }
-  function getAuthToken(): string;
 
-  const ddp: Data;
-  let isVerbose: boolean;
-  function _handleLoginCallback(err: any, res: any): void;
+  // Export default Meteor object
+  const Meteor: Meteor;
+  export default Meteor;
 
-  function useTracker<T>(cb: () => T): T;
+  // Export other members
+  export {
+    useTracker,
+    Accounts,
+  }
 }
