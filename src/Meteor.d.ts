@@ -1,3 +1,5 @@
+import { AsyncStorageStatic } from "@react-native-async-storage/async-storage";
+
 declare module '@meteorrn/core' {
   type Callback = (...args: unknown[]) => void;
   
@@ -25,6 +27,12 @@ declare module '@meteorrn/core' {
     };
   }
 
+  interface MeteorError {
+    error: string
+    reason?: string
+    details?: string
+  }
+
   interface User {
     _id: string;
     version: number;
@@ -34,8 +42,14 @@ declare module '@meteorrn/core' {
     };
   }
 
+  interface ConnectOptions {
+    suppressUrlErrors: boolean
+    AsyncStorage: AsyncStorageStatic
+    reachabilityUrl: string
+  }
+
   interface Meteor {
-    connect(endpoint: string, options?: any): void;
+    connect(endpoint: string, options?: ConnectOptions): void;
     disconnect(): void;
     reconnect(): void;
 
@@ -60,7 +74,7 @@ declare module '@meteorrn/core' {
 
     ddp: Data; 
 
-    _handleLoginCallback(err: any, res: any): void;
+    _handleLoginCallback(err?: MeteorError, res: { token: string, id: string }): void;
   }
 
   interface Accounts {
